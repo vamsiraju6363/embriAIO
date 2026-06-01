@@ -241,7 +241,8 @@ export default async function CourseOverviewPage({ params }: { params: { slug: s
           const total = chapters.length;
           const completed = Object.values(chapterProgressMap).filter(s => s === "completed").length;
           const inProg = Object.values(chapterProgressMap).filter(s => s === "in_progress").length;
-          const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+          const weightedProgress = completed + inProg * 0.5;
+          const pct = total > 0 ? Math.round((weightedProgress / total) * 100) : 0;
           return (
             <div className="mb-4 p-3" style={{ background: "#FFFDF5", border: "1px solid #C8B882" }}>
               <div className="flex items-center justify-between mb-2">

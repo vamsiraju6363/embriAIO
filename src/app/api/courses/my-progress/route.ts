@@ -66,7 +66,8 @@ export async function GET() {
   }
 
   const total = totalChapters ?? 0;
-  const percentComplete = total > 0 ? Math.round((completedChapters / total) * 100) : 0;
+  const weightedProgress = completedChapters + inProgressChapters * 0.5;
+  const percentComplete = total > 0 ? Math.round((weightedProgress / total) * 100) : 0;
 
   return NextResponse.json({
     totalChapters: total,

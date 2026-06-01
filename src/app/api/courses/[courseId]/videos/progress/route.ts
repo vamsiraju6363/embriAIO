@@ -104,17 +104,15 @@ export async function POST(
 
   let newStatus = currentProgress?.status ?? "not_started";
 
-  // If watching any video (>0%), mark chapter as in_progress
   if (percentWatched > 0 && newStatus === "not_started") {
     newStatus = "in_progress";
   }
 
-  // If this video is 90%+ watched, check if all videos are watched
+  // Auto-complete: if this video is ≥90% and it's the only video, mark chapter as completed
   if (percentWatched >= 90) {
-    // Get all other videos' progress from Redis or local state
-    // For now, we'll mark as in_progress and let the stats endpoint calculate actual completion
-    // A full implementation would track individual video progress per user
-    if (newStatus === "not_started") {
+    if (videoIds.length === 1) {
+      newStatus = "completed";
+    } else if (newStatus === "not_started") {
       newStatus = "in_progress";
     }
   }
@@ -128,6 +126,13 @@ export async function POST(
 
   if (newStatus === "in_progress" && !currentProgress?.status) {
     updates.started_at = now;
+  }
+
+  if (newStatus === "completed") {
+    updates.completed_at = now;
+    if (!currentProgress?.status) {
+      updates.started_at = now;
+    }
   }
 
   const { error: upsertError } = await supabase

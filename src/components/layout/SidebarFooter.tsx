@@ -45,8 +45,17 @@ export function SidebarFooter() {
   const percent = showCurriculum ? curriculumPercent : (isCourseRoute ? (courseProgress?.percentComplete ?? 0) : 0);
   const completedLabel = showCurriculum
     ? (completedNotebooks > 0 ? `${completedNotebooks} notebook${completedNotebooks !== 1 ? "s" : ""} completed` : null)
-    : (isCourseRoute && courseProgress && courseProgress.completedChapters > 0
-        ? `${courseProgress.completedChapters}/${courseProgress.totalChapters} chapter${courseProgress.totalChapters !== 1 ? "s" : ""} completed`
+    : (isCourseRoute && courseProgress && courseProgress.totalChapters > 0
+        ? (() => {
+            const parts: string[] = [];
+            if (courseProgress.completedChapters > 0) {
+              parts.push(`${courseProgress.completedChapters}/${courseProgress.totalChapters} chapter${courseProgress.totalChapters !== 1 ? "s" : ""} completed`);
+            }
+            if (courseProgress.inProgressChapters > 0) {
+              parts.push(`${courseProgress.inProgressChapters} in progress`);
+            }
+            return parts.length > 0 ? parts.join(" · ") : "No chapters started yet";
+          })()
         : null);
 
   return (
